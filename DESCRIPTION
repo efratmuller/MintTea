@@ -1,0 +1,7 @@
+Package: MintTea
+Type: Package
+Title: MintTea - Identifying Disease-Associated Modules in Multi-Omic Microbiome Data
+Version: 1.0.0
+Author: Efrat Muller
+Description: A package accompanying the publication: Muller, Efrat, Itamar Shiryan, and Elhanan Borenstein. "Multi-omic integration of microbiome data for identifying disease-associated modules." Nature Communications 15.1 (2024): 2621.
+License: MIT License
