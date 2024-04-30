@@ -2,20 +2,20 @@ Package: MintTea
 Type: Package
 Title: MintTea - Identifying Disease-Associated Modules in Multi-Omic Microbiome Data
 Version: 1.0.0
-Author: Efrat Muller
+Author: person("Efrat", "Muller", role="aut", email="efratmuller@mail.tau.ac.il")
 Description: A package accompanying the publication: Muller, Efrat, Itamar Shiryan, and Elhanan Borenstein. "Multi-omic integration of microbiome data for identifying disease-associated modules." Nature Communications 15.1 (2024): 2621.
 License: MIT License
 Depends:
     R (>= 3.5.0)
 Imports:
-    dplyr (>= 1.0.0)
-    mixOmics   (>= 6.18.1)
-    rsample    (>= 1.1.0)
-    pROC       (>= 1.18.0)
-    igraph     (>= 1.3.4)
-    ranger     (>= 0.14.1)
-    logger     (>= 0.2.2)
-    conflicted (>= 1.1.0)
-    stringr    (>= 1.4.1)
+    dplyr (>= 1.0.0),
+    mixOmics (>= 6.18.1),
+    rsample (>= 1.1.0),
+    pROC (>= 1.18.0),
+    igraph (>= 1.3.4),
+    ranger (>= 0.14.1),
+    logger (>= 0.2.2),
+    conflicted (>= 1.1.0),
+    stringr (>= 1.4.1)
 Language: en-US
 LazyData: true 
