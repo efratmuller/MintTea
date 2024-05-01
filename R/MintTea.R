@@ -111,8 +111,8 @@
 #' @examples
 #'  source('src/intermediate_integration/MintTea.R')
 #'  library(readr)
-#'  proc_data <- read_delim("data/example_data_for_minttea/proc_data.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
-#'  minttea_results <- MintTea(proc_data, view_prefixes = c('T', 'G', 'P', 'M'))
+#'  proc_data <- read_delim("test_data/proc_data.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
+#'  minttea_results <- MintTea(proc_data, view_prefixes = c('T', 'P', 'M'))
 #'
 MintTea <- function(
     proc_data,
@@ -131,9 +131,6 @@ MintTea <- function(
     return_main_results_only = TRUE,
     seed = 27
     ) {
-
-  # Load utilities
-  source("R/utils.R")
 
   # Check that all required packages are installed
   installed <- rownames(installed.packages())
@@ -288,7 +285,7 @@ MintTea <- function(
     feat_pairs <-
       # Get pairs of features that were found in the same component
       cv_loadings %>%
-      full_join(cv_loadings, by = c("fold_id","comp_fold_id")) %>%
+      full_join(cv_loadings, by = c("fold_id","comp_fold_id"), relationship = "many-to-many") %>%
       filter(feature.x != feature.y) %>%
       # In cases where a pair of features come out together in more than one
       #  component in the same run, we only count it once
@@ -512,6 +509,10 @@ MintTea <- function(
           )
           names(xlist) <- names(diablo_input$X)
           shuffled_modules[[curr_run]][[run]][[module_id]] <- unname(unlist(lapply(xlist, colnames)))
+
+          # Remove views without features in this module
+          rem <- sapply(xlist, ncol) == 0
+          xlist <- xlist[!rem]
         }
 
         # Run PCA on features in module
@@ -645,22 +646,22 @@ MintTea <- function(
           mutate(label = factor(label, levels = c("healthy", "disease")))
 
         # Train logistic regression / RF
-        logistic_model <- glm(label ~ ., data = train_data, family = "binomial")
+        # logistic_model <- glm(label ~ ., data = train_data, family = "binomial")
         rf <- ranger(label ~ ., data = train_data, probability = TRUE)
 
         # Make prediction on held out samples
-        preds_glm <- predict(logistic_model, test_data, type = "response")
+        # preds_glm <- predict(logistic_model, test_data, type = "response")
         preds_rf <- predict(rf, test_data)$predictions
 
         # Calculate and save overall auroc
-        tmp <- data.frame(preds_glm = preds_glm, preds_rf = preds_rf[,'disease'], true_label = test_data$label)
+        tmp <- data.frame(preds_rf = preds_rf[,'disease'], true_label = test_data$label) # preds_glm = preds_glm,
         cv_overall_auc <- bind_rows(
           cv_overall_auc,
           data.frame(
             setting = curr_run,
             run = run,
             fold_id = fold_id,
-            test_auc_glm = get_auc('preds_glm', tmp),
+            # test_auc_glm = get_auc('preds_glm', tmp),
             test_auc_rf = get_auc('preds_rf', tmp)
           )
         )
@@ -674,8 +675,8 @@ MintTea <- function(
     group_by(setting, run) %>%
     summarise(mean_overall_rf_auc = mean(test_auc_rf, na.rm = TRUE),
               sd_overall_rf_auc = sd(test_auc_rf, na.rm = TRUE),
-              mean_overall_lm_auc = mean(test_auc_glm, na.rm = TRUE),
-              sd_overall_lm_auc = sd(test_auc_glm, na.rm = TRUE),
+              #mean_overall_lm_auc = mean(test_auc_glm, na.rm = TRUE),
+              #sd_overall_lm_auc = sd(test_auc_glm, na.rm = TRUE),
               .groups = "drop")
 
   summary_module_aucs <- module_aucs %>%
@@ -688,8 +689,9 @@ MintTea <- function(
   # 6. Return a list of identified modules or summary tables
   # ----------------------------------------------------------------
 
-  # Re-organize results in tables into a list of MintTea modules
+  # Re-organize results as a list of MintTea modules
   modules_list <- list()
+
   # Iterate over MintTea settings (for cases when MintTea was executed with
   #  several optional settings)
   for (curr_run in unique(sens_analysis_modules$run_id)) {
