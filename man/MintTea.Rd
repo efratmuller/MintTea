@@ -10,15 +10,15 @@ The MintTea function receives a table containing multiple concatenated omics, al
   \item{study_group_column}{Name of column holding study groups}
   \item{sample_id_column}{Name of column holding sample identifiers}
   \item{view_prefixes}{Vector of prefixes marking the different views/omics}
-  \item{param_diablo_keepX}{Number of features to select from each view, serving as a constraint for the sparse CCA. Note: these are sparsity constraints for the CCA modules, not the final consensus modules. Higher values will produce larger modules. More than one value can be provided if sensitivity analysis is desired.}
-  \item{param_sgcca_design}{A prior on expected relations between different views. Supports values between 0 and 1 (inclusive). 0 indicates no association between views is expected, and modules should maximize association with disease only. 1 indicates expected inter-view association and modules should therefore maximize both disease-association and between-view associations. More than one value can be provided if sensitivity analysis is desired.}
+  \item{param_diablo_keepX}{Number of features to select from each view, serving as a constraint for the sparse CCA. Note: these are sparsity constraints for the CCA modules, not the final consensus modules. Higher values will produce larger modules. More than one value can be provided if sensitivity analysis is desired. Default: 10}
+  \item{param_sgcca_design}{A prior on expected relations between different views. Supports values between 0 and 1 (inclusive). 0 indicates no association between views is expected, and modules should maximize association with disease only. 1 indicates expected inter-view association and modules should therefore maximize both disease-association and between-view associations. More than one value can be provided if sensitivity analysis is desired. Default: 0.5}
   \item{param_n_repeats}{Number of sCCA repeats on data subsamples. More than one value can be provided if sensitivity analysis is desired.}
   \item{param_n_folds}{Number of folds used for subsetting the data before running sCCA (DIABLO). A value of 10, for example, will divide the data into 10 subsets, and then run CCA on 9/10 of the data, excluding each subset one at a time. Lower values will result in smaller subsets used for training and accordingly to higher variability between sCCA models. In such a case we expect less modules to be identified, but their robustness to be higher. More than one value can be provided if sensitivity analysis is desired.}
-  \item{param_sgcca_ncomp}{Number of sCCA components to extract each DIABLO run. Note that DIABLO authors recommend using only the first few components. Typically, components >3 are less stable, and will often not contribute to final consensus modules. More than one value can be provided if sensitivity analysis is desired.}
-  \item{param_edge_thresholds}{Number between 0 and 1 (exclusive), determining the threshold for consensus components. Higher values mean more conservative results. Values between 0.5 and 0.8 are recommended. More than one value can be provided if sensitivity analysis is desired.}
+  \item{param_sgcca_ncomp}{Number of sCCA components to extract each DIABLO run. Note that DIABLO authors recommend using only the first few components. Typically, components >3 are less stable, and will often not contribute to final consensus modules. More than one value can be provided if sensitivity analysis is desired. Default: 5}
+  \item{param_edge_thresholds}{Number between 0 and 1 (exclusive), determining the threshold for consensus components. Higher values mean more conservative results. Values between 0.5 and 0.8 are recommended. More than one value can be provided if sensitivity analysis is desired. Default: 0.8}
   \item{n_evaluation_repeats}{Number of cross-validation repeats for overall AUROC estimation}
   \item{n_evaluation_folds}{Number of cross-validation folds for overall AUROC estimation}
-  \item{log_level}{See \code{library(logger); ?log_levels}}
+  \item{log_level}{See \code{library(logger); ?log_levels}. Default: \code{DEBUG}}
   \item{seed}{For result reproducibility}
 }
 \details{
@@ -31,6 +31,7 @@ Future versions will include:
 - Currently supports only "healthy" and "disease" study groups. Will be relaxed to any arbitrary group names;
 - Support for more than 2 study groups;
 - Support for continuous labels;
+- Support for using an independent validation set for AUC calculations, rather than CV;
 }
 \value{
 A list of MintTea's multi-view modules, for each MintTea pipeline setting used.
