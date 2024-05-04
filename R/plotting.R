@@ -1,7 +1,6 @@
 plot_module_stats <- function(minttea_results, settings, module) {
   require(dplyr)
   require(ggplot2)
-  require(cowplot)
 
   tmp <- data.frame(AUC = minttea_results[[settings]][[module]]$shuffled_auroc, Mode = 'Null')
   tmp$Mode <- factor(tmp$Mode, levels = c('Null', 'True module'))
