@@ -49,12 +49,12 @@ For each module, the following properties are returned:
 \code{library(mixOmics); library(PMA)}
 }
 \examples{
-library(readr)
+library(MintTea)
 
 # Load example data
-processed_data <- read_delim("test_data/proc_data.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
+data("test_data")
 
 # Run MintTea
-minttea_results <- MintTea(processed_data, view_prefixes = c('T', 'P', 'M'))
+minttea_results <- MintTea(test_data, view_prefixes = c('T', 'P', 'M'))
 }
 
