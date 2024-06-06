@@ -94,7 +94,7 @@ library(MintTea)
 ```
 library(MintTea)
 library(readr)
-preprocessed_data <- read_delim("test_data/proc_data.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
+preprocessed_data <- data('test_data')
 minttea_results <- MintTea(preprocessed_data, view_prefixes = c('T', 'P', 'M'))
 ```
 
