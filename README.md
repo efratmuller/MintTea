@@ -107,7 +107,6 @@ For questions about the pipeline, please contact elbo@tauex.tau.ac.il.
 **Backlog:**
 
      * Support parallel running to shorten runtimes.
-     * Generalize to support any categorical label (currently hard-coded to 'healthy' and 'disease').
      * Generalize to support continuous labels.
      
 ***
