@@ -13,7 +13,7 @@ MintTea is a method for identifying multi-omic modules of features that are both
 
 For further details see: Muller, Efrat, Itamar Shiryan, and Elhanan Borenstein. __"Multi-omic integration of microbiome data for identifying disease-associated modules."__ _Nature Communications_ 15.1 (2024): 2621. [Link](https://www.nature.com/articles/s41467-024-46888-3)
 
-<img src="https://github.com/borenstein-lab/multi_view_integration_analysis/blob/main/docs/wiki_figure.png" width="700">
+<img src="docs/wiki_figure.png" width="700">
 
 ***
 
