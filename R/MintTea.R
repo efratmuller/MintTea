@@ -21,8 +21,6 @@
 #'
 #' Future versions will include:
 #' - Support for running in parallel on multiple threads.
-#' - Currently supports only "healthy" and "disease" study groups. Will be
-#'   relaxed to any arbitrary group names.
 #' - Support for more than 2 study groups.
 #' - Support for continuous labels.
 #'
@@ -39,9 +37,13 @@
 #'
 #' @param study_group_column Name of column holding study groups
 #'
+#' @param control_group_name Label for the "control" group. Defaults to "healthy"
+#'
+#' @param case_group_name Label for the "case" group. Defaults to "disease"
+#'
 #' @param sample_id_column Name of column holding sample identifiers
 #'
-#' @param view_prefixes
+#' @param view_prefixes The letter prefixes for each omic in the data
 #'
 #' @param param_diablo_keepX Number of features to select from each view,
 #'   serving as a constraint for the sparse CCA. Note: these are sparsity
@@ -117,6 +119,8 @@
 MintTea <- function(
     proc_data,
     study_group_column = "disease_state",
+    control_group_name = "healthy",
+    case_group_name = "disease",
     sample_id_column = "sample_id",
     view_prefixes,
     param_diablo_keepX = c(10),
@@ -143,12 +147,6 @@ MintTea <- function(
   if (! "logger" %in% installed)   stop("Please install package 'logger'")
   if (! "conflicted" %in% installed) stop("Please install package 'conflicted'")
   if (! "stringr" %in% installed) stop("Please install package 'stringr'")
-
-  # Check that 'utils.R' was sourced
-  if ((!exists('is_valid_r_name')) |
-      (!exists('organize_data_for_diablo')) |
-      (!exists('get_auc')) )
-    stop("Please make sure you succesfully ran `source('src/intermediate_integration/utils.R')` before executing MintTea")
 
   # Required packages
   require(dplyr)      # Tested with version: 1.0.10
@@ -197,8 +195,12 @@ MintTea <- function(
   if (sum(duplicated(proc_data[[sample_id_column]])) > 0) stop("Sample ID's are not unique.")
 
   ## Verify supported study group labels (TODO: support arbitrary labels)
-  if (sum(! proc_data[[study_group_column]] %in% c('healthy','disease')) > 0) stop("Study-group labels currently supported: 'healthy' and 'disease' only.")
-  if (n_distinct(proc_data[[study_group_column]]) == 1) stop("Only one study group provided. 2 required.")
+  if (sum(! proc_data[[study_group_column]] %in% c(control_group_name, case_group_name)) > 0)
+    stop("Study-group labels are expected to be either: ",
+         control_group_name, " or ", case_group_name,
+         ". See parameters: 'control_group_name' and 'case_group_name'")
+  if (n_distinct(proc_data[[study_group_column]]) == 1)
+    stop("Only one study group provided. 2 required.")
 
   ## Verify all columns are numeric
   if (sum(apply(proc_data %>%
@@ -634,23 +636,25 @@ MintTea <- function(
               run = run,
               fold_id = fold_id,
               module_id = module_id,
-              auc = get_auc(paste0('module', module_id), data = test_data, label_col = "label", auto_direction = TRUE)
+              auc = get_auc(paste0('module', module_id),
+                            data = test_data,
+                            label_col = "label",
+                            auto_direction = TRUE,
+                            label_levels = c(control_group_name, case_group_name))
             )
           )
         } # Done iterating over modules
 
         # Important for GLM
         train_data <- train_data %>%
-          mutate(label = factor(label, levels = c("healthy", "disease")))
+          mutate(label = factor(label, levels = c(control_group_name, case_group_name)))
         test_data <- test_data %>%
-          mutate(label = factor(label, levels = c("healthy", "disease")))
+          mutate(label = factor(label, levels = c(control_group_name, case_group_name)))
 
-        # Train logistic regression / RF
-        # logistic_model <- glm(label ~ ., data = train_data, family = "binomial")
+        # Train RF
         rf <- ranger(label ~ ., data = train_data, probability = TRUE)
 
         # Make prediction on held out samples
-        # preds_glm <- predict(logistic_model, test_data, type = "response")
         preds_rf <- predict(rf, test_data)$predictions
 
         # Calculate and save overall auroc
@@ -661,7 +665,6 @@ MintTea <- function(
             setting = curr_run,
             run = run,
             fold_id = fold_id,
-            # test_auc_glm = get_auc('preds_glm', tmp),
             test_auc_rf = get_auc('preds_rf', tmp)
           )
         )

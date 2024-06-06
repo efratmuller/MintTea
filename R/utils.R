@@ -102,76 +102,11 @@ get_all_inter_omic_corrs <- function(comp_data) {
 
 
 
-get_auc <- function(pred_col, data, label_col = "true_label", auto_direction = FALSE) {
+get_auc <- function(pred_col, data, label_col = "true_label", auto_direction = FALSE, label_levels) {
   if (n_distinct(data[[label_col]]) == 1) return(NA)
   f <- as.formula(paste(label_col, "~", pred_col))
   if (auto_direction) return(as.numeric(auc(roc(formula = f, data = data, quiet = TRUE))))
-  return(as.numeric(auc(roc(formula = f, data = data, levels = c("healthy", "disease"), direction = "<"))))
-}
-
-get_cv_auc <- function(diablo_input, rf_cv_results = NULL, folds, list_keepX, final_ncomp, diablo_dist, diablo_design) {
-  require(pROC)
-  require(rsample)
-
-  n_samples <- length(diablo_input$sample_ids)
-
-  # Collect AUC stats
-  my_aucs <- data.frame()
-
-  for (i in 1:nrow(folds)) {
-    fold_id <- paste(folds$splits[[i]]$id, collapse = " ")
-    cat('.')
-
-    # Partition the data into train and test ("held-out")
-    # held_out_samples_i <- sample(1:n_samples, round(n_samples/10))
-    # train_samples <- setdiff(1:n_samples, held_out_samples_i)
-
-    train_samples <- folds$splits[[i]]$in_id
-    held_out_samples_i <- setdiff(1:n_samples, train_samples)
-    new_diablo_input <- remove_samples_from_input(diablo_input, held_out_samples_i)
-    held_out_data <- remove_samples_from_input(diablo_input, train_samples)
-
-    # Train DIABLO model
-    tmp_diablo_out <- block.splsda(
-      new_diablo_input$X,
-      new_diablo_input$Y,
-      ncomp = final_ncomp,
-      keepX = list_keepX,
-      max.iter = 300,
-      design = diablo_design
-    )
-
-    # Make prediction on held out samples
-    predictions <- predict(tmp_diablo_out, held_out_data$X, dist = diablo_dist)
-
-    # Calculate auroc
-    tmp <- data.frame(preds = predictions$AveragedPredict[,1,], true_label = held_out_data$Y)
-    #tmp2 <- bind_rows(tmp2, tmp %>% mutate(fold_id=fold_id))
-    my_aucs_v <- lapply(1:final_ncomp, function(i) get_auc(paste0("preds.dim", i), tmp))
-    names(my_aucs_v) <- paste0("auc_comp", 1:final_ncomp)
-    my_aucs <- bind_rows(
-      my_aucs,
-      data.frame(my_aucs_v) %>%
-        mutate(fold_id = fold_id) %>%
-        mutate(h_ratio_train = round(unname(table(new_diablo_input$Y)['healthy']) / length(new_diablo_input$Y), 3)) %>%
-        mutate(h_ratio_test = round(unname(table(held_out_data$Y)['healthy']) / length(held_out_data$Y), 3))
-    )
-  }
-  cat('\n')
-
-  # Add information from ML pipeline results (matched by fold)
-  if (!is.null(rf_cv_results))
-    my_aucs <- my_aucs %>%
-      left_join(
-        rf_cv_results %>%
-          select(fold_id, out_of_fold_test_auc, mean_out_of_fold_test_auc, h_ratio_train, h_ratio_test) %>%
-          rename(rf_fold_auc = out_of_fold_test_auc) %>%
-          rename(mean_rf_auc = mean_out_of_fold_test_auc) %>%
-          rename(h_ratio_train_SANITY = h_ratio_train, h_ratio_test_SANITY = h_ratio_test),
-        by = "fold_id"
-      )
-
-  return(my_aucs)
+  return(as.numeric(auc(roc(formula = f, data = data, levels = label_levels, direction = "<"))))
 }
 
 get_cor_btwn_variates <- function(diablo_out, block1, block2, comp_id) {
