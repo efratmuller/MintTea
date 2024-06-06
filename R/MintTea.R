@@ -111,10 +111,9 @@
 #' @export
 #'
 #' @examples
-#'  source('src/intermediate_integration/MintTea.R')
-#'  library(readr)
-#'  proc_data <- read_delim("test_data/proc_data.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
-#'  minttea_results <- MintTea(proc_data, view_prefixes = c('T', 'P', 'M'))
+#'  library(MintTea)
+#'  data("test_data")
+#'  minttea_results <- MintTea(test_data, view_prefixes = c('T', 'P', 'M'))
 #'
 MintTea <- function(
     proc_data,
@@ -665,7 +664,7 @@ MintTea <- function(
             setting = curr_run,
             run = run,
             fold_id = fold_id,
-            test_auc_rf = get_auc('preds_rf', tmp)
+            test_auc_rf = get_auc('preds_rf', tmp, label_levels = c(control_group_name, case_group_name))
           )
         )
       } # Completed cross-validation
