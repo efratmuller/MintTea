@@ -43,25 +43,7 @@ library(MintTea)
    * Features in each view should be pre-processed in advance, according to common practices;  
    * It is highly recommended **to remove rare features, and cluster highly correlated features**;  
  
-3. Optionally, edit the default pipeline parameters. MintTea supports running the pipeline with multiple parameter combinations, to encourage sensitivity analysis and enable the user to check which settings generate the most informative modules. The full list of MintTea paramaters is given below:
-
-     | Parameter            | Description                                                                                                    |
-     | -------------------- | -------------------------------------------------------------------------------------------------------------- |
-     | `proc_data`          | A single table containing all features of all views. Samples are rows and features are columns. Two special columns expected to be included in the table are a column holding sample identifiers and a column holding study groups ("healthy" and "disease"). Features from each view should start with the a prefix indicating which view are they related to, followed by two underscores, e.g. 'T_' for taxonomy, 'P_' for pathways, and 'M_' for metabolites. Features in each view should be pre-processed according to common practices. It is advised to remove rare features, and cluster highly correlated features. |
-     | `study_group_column` | Name of column holding study groups. |
-     | `sample_id_column`   | Name of column holding sample identifiers. |
-     | `view_prefixes`      | Feature prefixes differentiating the different views, e.g. `c('T','P','M')` (for Taxonomy, Pathways, Metabolites, respectively). All feature names should start with one of the given prefixes followed by two underscores. |
-     | `param_diablo_keepX` | Number of features to select from each view, serving as a constraint for the sparse CCA. Note: these are sparsity constraints for the CCA modules, not the final consensus modules. Higher values will produce larger modules. More than one value can be provided if sensitivity analysis is desired. |
-     | `param_diablo_design` | A prior on expected relations between different views. Supports values between 0 and 1 (inclusive). 0 indicates no association between views is expected, and modules should maximize association with disease only. 1 indicates expected inter-view association and modules should therefore maximize both disease-association and between-view associations. More than one value can be provided if sensitivity analysis is desired. |
-     | `param_n_repeats`     | Number of sCCA repeats on data subsamples. More than one value can be provided if sensitivity analysis is desired. |
-     | `param_n_folds`       | Number of folds used for subsetting the data before running sCCA (DIABLO). A value of 10, for example, will divide the data into 10 subsets, and then run CCA on 9/10 of the data, excluding each subset one at a time. Lower values will result in smaller subsets used for training and accordingly to higher variability between sCCA models. In such a case we expect less modules to be identified, but their robustness to be higher. More than one value can be provided if sensitivity analysis is desired. |
-     | `param_diablo_ncomp`  | Number of sCCA components to extract each DIABLO run. Note that DIABLO authors recommend using only the first few components. Typically, components >3 are less stable, and will often not contribute to final consensus modules. More than one value can be provided if sensitivity analysis is desired. |
-     | `param_edge_thresholds` | Number between 0 and 1 (exclusive), determining the threshold for consensus components. Higher values mean more conservative results. Values between 0.5 and 0.8 are recommended. More than one value can be provided if sensitivity analysis is desired.  |
-     | `n_evaluation_repeats` | Number of cross-validation repeats for overall AUROC estimation. |
-     | `n_evaluation_folds`  | Number of cross-validation folds for overall AUROC estimation. |
-     | `log_level`           | See `library(logger); ?log_levels` |
-     | `seed`                | For reproducability. |
-
+3. Optionally, edit the default pipeline parameters. MintTea supports running the pipeline with multiple parameter combinations, to encourage sensitivity analysis and enable the user to check which settings generate the most informative modules. For the full list of MintTea paramaters, see: `?MintTea`.
 
 4. Pipeline results are returned as a list of multi-view modules, given for each MintTea pipeline setting requested. For each module, the following properties are returned: 
 
@@ -93,9 +75,8 @@ library(MintTea)
 
 ```
 library(MintTea)
-library(readr)
-preprocessed_data <- data('test_data')
-minttea_results <- MintTea(preprocessed_data, view_prefixes = c('T', 'P', 'M'))
+data('test_data')
+minttea_results <- MintTea(test_data, view_prefixes = c('T', 'P', 'M'))
 ```
 
 *** 
@@ -107,7 +88,6 @@ For questions about the pipeline, please contact elbo@tauex.tau.ac.il.
 **Backlog:**
 
      * Support parallel running to shorten runtimes.
-     * Generalize to support any categorical label (currently hard-coded to 'healthy' and 'disease').
      * Generalize to support continuous labels.
      
 ***
