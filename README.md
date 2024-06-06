@@ -75,9 +75,8 @@ library(MintTea)
 
 ```
 library(MintTea)
-library(readr)
-preprocessed_data <- data('test_data')
-minttea_results <- MintTea(preprocessed_data, view_prefixes = c('T', 'P', 'M'))
+data('test_data')
+minttea_results <- MintTea(test_data, view_prefixes = c('T', 'P', 'M'))
 ```
 
 *** 
