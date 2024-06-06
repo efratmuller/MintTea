@@ -658,7 +658,7 @@ MintTea <- function(
         preds_rf <- predict(rf, test_data)$predictions
 
         # Calculate and save overall auroc
-        tmp <- data.frame(preds_rf = preds_rf[,'disease'], true_label = test_data$label) # preds_glm = preds_glm,
+        tmp <- data.frame(preds_rf = preds_rf[,case_group_name], true_label = test_data$label)
         cv_overall_auc <- bind_rows(
           cv_overall_auc,
           data.frame(
