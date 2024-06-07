@@ -1,3 +1,15 @@
+# minttea_module = minttea_results$`keep_10//des_0.5//nrep_10//nfol_5//ncom_5//edge_0.8`$module1
+plot_module_with_igraph <- function(minttea_module, prefix_colors = c('T' = 'darkred','P' = 'darkgreen', 'M' = 'purple4')) {
+  require(igraph)
+  nodes <- data.frame(node = minttea_module$features) %>%
+    mutate(prefix = gsub('__.*$','',node)) %>%
+    mutate(color = prefix_colors[prefix])
+  edges <- minttea_module$module_edges %>%
+    mutate(width = edge_weight)
+  g <- graph_from_data_frame(edges, directed=F, vertices = nodes)
+  plot(g, vertex.label.cex = 0.8, vertex.label.dist = -2, vertex.label.color = 'black', edge.color = 'grey80')
+}
+
 plot_module_stats <- function(minttea_results, settings, module) {
   require(dplyr)
   require(ggplot2)
