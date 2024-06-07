@@ -81,7 +81,7 @@ minttea_results <- MintTea(test_data, view_prefixes = c('T', 'P', 'M'))
 
 *** 
 
-For questions about the pipeline, please contact elbo@tauex.tau.ac.il.
+For questions about the pipeline, please open an issue (https://github.com/efratmuller/MintTea/issues) or contact Prof. Elhanan Borenstein at elbo@tauex.tau.ac.il.
 
 ***
 
