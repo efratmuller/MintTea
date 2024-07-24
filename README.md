@@ -39,7 +39,7 @@ library(MintTea)
 2. Organize your input data in a *single* data.frame object, following these guidelines:
    * Rows represent samples and columns are features;  
    * The dataframe should include two special columns: a column holding sample identifiers and a column holding study groups ("healthy" and "disease" labels);  
-   * Features from each omic should start with the omic-prefix (for example: 'T_' for taxonomy, 'P_' for pathways, 'M_' for metabolites, etc.);  
+   * Features from each omic should start with the omic-prefix (for example: 'T__' for taxonomy, 'P__' for pathways, 'M__' for metabolites, etc. Note the two consecutive underscores);  
    * Features in each view should be pre-processed in advance, according to common practices;  
    * It is highly recommended **to remove rare features, and cluster highly correlated features**;  
  
