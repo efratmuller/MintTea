@@ -37,9 +37,9 @@
 #'
 #' @param study_group_column Name of column holding study groups
 #'
-#' @param control_group_name Label for the "control" group. Defaults to "healthy"
+#' @param control_group_name Label for the "control" group. Should match the labels given in the `study_group_column` column. Defaults to "healthy"
 #'
-#' @param case_group_name Label for the "case" group. Defaults to "disease"
+#' @param case_group_name Label for the "case" group. Should match the labels given in the `study_group_column` column. Defaults to "disease"
 #'
 #' @param sample_id_column Name of column holding sample identifiers
 #'
@@ -193,7 +193,7 @@ MintTea <- function(
   ## Verify unique sample ID
   if (sum(duplicated(proc_data[[sample_id_column]])) > 0) stop("Sample ID's are not unique.")
 
-  ## Verify supported study group labels (TODO: support arbitrary labels)
+  ## Verify supported study group labels
   if (sum(! proc_data[[study_group_column]] %in% c(control_group_name, case_group_name)) > 0)
     stop("Study-group labels are expected to be either: ",
          control_group_name, " or ", case_group_name,
