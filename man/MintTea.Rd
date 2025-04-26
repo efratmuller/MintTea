@@ -8,8 +8,8 @@ The MintTea function receives a table containing multiple concatenated omics, al
 \arguments{
   \item{proc_data}{A single table containing all features of all views. Samples are rows and features are columns. Two special columns expected are a column holding sample identifiers and a column holding study groups ("healthy" and "disease"). Features from each view should start with a prefix representing the specific view followed by two underscores, e.g. 'T_' for taxonomy, 'G_' for genes, 'P_' for pathways, 'M_' for metabolites. Features in each view should be pre-processed according to common practices. It is advised to remove rare features, and cluster highly-correlated features.}
   \item{study_group_column}{Name of column holding study groups}
-  \item{control_group_name}{Label for the "control" group. Defaults to "healthy"}
-  \item{case_group_name}{Label for the "case" group. Defaults to "disease"}
+  \item{control_group_name}{Label for the "control" group. Should match the labels given in the `study_group_column` column. Defaults to "healthy"}
+  \item{case_group_name}{Label for the "case" group. Should match the labels given in the `study_group_column` column. Defaults to "disease"}
   \item{sample_id_column}{Name of column holding sample identifiers}
   \item{view_prefixes}{Vector of prefixes marking the different views/omics}
   \item{param_diablo_keepX}{Number of features to select from each view, serving as a constraint for the sparse CCA. Note: these are sparsity constraints for the CCA modules, not the final consensus modules. Higher values will produce larger modules. More than one value can be provided if sensitivity analysis is desired. Default: 10}
@@ -30,7 +30,6 @@ The pipeline could be run using one or more set of pipeline parameters. If more 
 
 Future versions will include:
 - Support for running in parallel on multiple threads;
-- Currently supports only "healthy" and "disease" study groups. Will be relaxed to any arbitrary group names;
 - Support for more than 2 study groups;
 - Support for continuous labels;
 - Support for using an independent validation set for AUC calculations, rather than CV;
